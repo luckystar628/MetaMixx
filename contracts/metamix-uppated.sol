@@ -33,8 +33,8 @@ contract MetaMixx {
         uint256 packageLevel,
         uint256 amount
     );
-    event FundsWithdrawn(address indexed owner, uint amount);
-    event UpdateOwner(address indexed owner);
+    event FundsWithdrawn(address indexed owner, uint amount);  //????????????????????????? What is it ???????????????????????????
+    event UpdateOwner(address indexed owner);  
     event UpdateUser(address indexed _oldAddress, address indexed _newAddress);
 
     modifier onlyOwner() {
@@ -42,6 +42,9 @@ contract MetaMixx {
         _;
     }
 
+
+// the constructor only runs once when the contract is deployed
+// it is used to initialize the contract state
     constructor(string memory _referralId, address _tokenAddress) {
         contractOwner = msg.sender;
         users[msg.sender].registered = true;
@@ -73,9 +76,9 @@ contract MetaMixx {
         users[msg.sender].registered = true;
         users[msg.sender].referralId = _referralId;
         users[msg.sender].parentReferral = _referralAddress;
-        User storage parent = users[_referralAddress];
+        User storage parent = users[_referralAddress];  //parent of the msg.sender
         parent.childReferrals.push(msg.sender);
-        referralIds[_referralId] = msg.sender;
+        referralIds[_referralId] = msg.sender; // log a new  referalId in referalIds list ( map(string => address) ) 
         emit UserRegistered(msg.sender, _referralId, _referralAddress);
     }
 
@@ -89,6 +92,7 @@ contract MetaMixx {
             "Invalid new owner address."
         );
         contractOwner = _newOwner;
+        // users is mapping(address => User(??struct??)), so like as below!!
         users[contractOwner].registered = true;
         users[contractOwner].referralId = users[msg.sender].referralId;
         users[contractOwner].parentReferral = contractOwner;
@@ -130,7 +134,6 @@ contract MetaMixx {
         users[_newAddress].referralId = users[_oldAddress].referralId;
         users[_newAddress].parentReferral = users[_oldAddress].parentReferral;
         users[_newAddress].level = users[_oldAddress].level;
-
         User storage parent = users[users[_newAddress].parentReferral];
         
         // update oldAddress as newAddress in parent children list.
